@@ -89,5 +89,22 @@ if [ -n "$JA_PUBLICOU" ]; then
   exit 0
 fi
 
+# Pasta vazia = slot pulado. A checagem acontece AQUI, e nao so dentro do
+# script de publicacao, de proposito: sem isso o agendador dispararia o
+# workflow de publicacao a cada 10 minutos para uma pasta vazia, enchendo o
+# historico do Actions de execucoes inuteis (e de falhas vermelhas, enquanto
+# os secrets da Meta ainda nao estiverem cadastrados).
+PASTA="pendentes/stories/${SLOT}"
+TEM_MATERIAL=$(find "$PASTA" -maxdepth 1 -type f \
+  \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.mp4' -o -iname '*.mov' \) \
+  2>/dev/null | head -n 1)
+
+if [ -z "$TEM_MATERIAL" ]; then
+  echo "Nenhum story pendente em ${PASTA}/. Slot '${SLOT}' pulado."
+  echo "Verificacao concluida."
+  exit 0
+fi
+
+echo "Material encontrado: ${TEM_MATERIAL}"
 disparar "$SLOT"
 echo "Verificacao concluida."
