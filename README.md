@@ -34,6 +34,13 @@ O agente **não gera conteúdo**. Quem abastece as pastas é outro agente, no
 mesmo dia da publicação, algumas horas antes — o contrato entre os dois está em
 [`ESPECIFICACAO_MATERIAIS.md`](ESPECIFICACAO_MATERIAIS.md).
 
+Desde 26/08/2026, esse "outro agente" é automatizado: 3 tarefas agendadas do
+Cowork (05h/09h/15h BRT, uma por slot) seguem
+[`RUNBOOK_GERACAO.md`](RUNBOOK_GERACAO.md) pra escrever, renderizar e enviar
+o próximo story de cada tema — sempre com 3h de folga antes do horário de
+publicação. Enquetes e vídeo ficam fora desse fluxo por enquanto (limitação
+real da API / decisão do Rafael, ver histórico no fim do RUNBOOK).
+
 ---
 
 ## 2. Estrutura de arquivos
