@@ -124,6 +124,10 @@ futura.
   uma publicação legítima por causa de um commit atrasado de outro horário, e
   publicar duas vezes se o agendador rodar mais de uma vez na mesma janela.
 - Por isso o checkout do agendador usa `fetch-depth: 0` (histórico completo).
+- **Pasta vazia = nenhum disparo.** O agendador confere se existe arquivo de
+  mídia na pasta do slot antes de acionar a publicação. Sem isso ele dispararia
+  o workflow de publicação a cada 10 minutos contra uma pasta vazia, enchendo o
+  histórico do Actions de execuções inúteis.
 
 ### 3.5 Testar
 
