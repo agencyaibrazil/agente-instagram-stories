@@ -1,0 +1,45 @@
+name: Agendador de Postagem de Stories
+
+# Roda a cada 10 minutos e decide, pelo relógio real (não pelo horário nominal
+# do cron), se está dentro da janela de algum dos 3 slots do dia. Toda a lógica
+# de horário, janela e antiduplicidade fica em script/agendador.sh — AJUSTE OS
+# HORÁRIOS LÁ, não aqui.
+#
+# Por que não usar "schedule:" direto em postar-stories.yml: o agendador nativo
+# do GitHub Actions atrasa horas ou perde disparos quando o cron é esparso
+# (1x/dia). Cron frequente (*/10) é bem mais confiável, e a janela larga de cada
+# slot absorve o atraso que ainda sobra.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      forcar_slot:
+        description: "Força a publicação de um slot agora, ignorando janela e antiduplicidade."
+        type: choice
+        default: nenhum
+        options: [nenhum, rotina, noticia, futuro]
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: agendador-postagem-stories
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório (histórico completo, necessário para o git log)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verificar janela e disparar publicação
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCAR_SLOT: ${{ inputs.forcar_slot }}
+        run: bash script/agendador.sh

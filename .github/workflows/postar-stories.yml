@@ -1,0 +1,41 @@
+name: Postar Story no Instagram
+
+on:
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Qual slot publicar (rotina = 08h, noticia = 12h, futuro = 18h)."
+        type: choice
+        required: true
+        options: [rotina, noticia, futuro]
+  # SEM "schedule:" aqui de propósito — quem decide a hora de disparar é o
+  # agendador.yml (roda a cada 10min e checa o horário real). Ver a seção
+  # "Como funciona o agendamento" do README antes de mexer aqui.
+
+permissions:
+  contents: write
+
+concurrency:
+  group: postar-story-instagram
+  cancel-in-progress: false
+
+jobs:
+  postar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r script/requirements.txt
+
+      - name: Executar agente de postagem (story)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_BUSINESS_ACCOUNT_ID: ${{ secrets.IG_BUSINESS_ACCOUNT_ID }}
+        run: python script/postar_story.py --slot "${{ inputs.slot }}"
